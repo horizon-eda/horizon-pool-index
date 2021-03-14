@@ -1,0 +1,18 @@
+name: Build index
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container: horizoneda/horizon:latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install yaml
+      run: apt-get install -y python3-yaml
+    - name: build index.json
+      run: python3 build.py index.json
+    - name: print
+      run: cat index.json
