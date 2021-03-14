@@ -5,14 +5,35 @@ on:
     branches: [ master ]
 
 jobs:
-  check:
+  build:
     runs-on: ubuntu-latest
     container: horizoneda/horizon:latest
     steps:
     - uses: actions/checkout@v2
     - name: install yaml
-      run: apt-get install -y python3-yaml
+      run: apt-get install -y python3-yaml openssh-client
+    - name: setup git
+      run: |
+        mkdir ~/.ssh
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        echo $SSH_PRIVKEY > ~/.ssh/id_rsa
+        git config --global user.email "index-bot@horizon-eda.org"
+        git config --global user.name "Horizon EDA Index bot"
+      env:
+        SSH_PRIVKEY: ${{ secrets.secrets.SSH_KEY }}
+    - name: checkout index output
+      uses: actions/checkout@v2
+      with:
+        repository: horizon-eda/horizon-pool-index-output
+        ssh-key: ${{ secrets.SSH_KEY }}
+        path: output
     - name: build index.json
-      run: python3 build.py index.json
+      run: python3 build.py output/index.json
     - name: print
-      run: cat index.json
+      run: cat output/index.json
+    - name: commit & push index
+      working-directory: output
+      run: |
+        git add .
+        git diff-index --quiet HEAD || git commit -m 'update'
+        git push
