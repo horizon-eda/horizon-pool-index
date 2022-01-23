@@ -1,0 +1,5 @@
+level: community
+source:
+  type: github
+  user: jue89
+  repo: horizon-pool-rohm-resistors
