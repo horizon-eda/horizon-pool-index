@@ -1,0 +1,5 @@
+level: community
+source:
+  type: github
+  user: oxplot
+  repo: horizon-pool-macrofab-house-parts
